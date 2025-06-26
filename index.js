@@ -13,7 +13,8 @@ let settings = {
   minHumidity: 20,    // 20%
   maxHumidity: 80,    // 80%
   minTemperature: 5,  // 5°C
-  maxTemperature: 35  // 35°C
+  maxTemperature: 35,  // 35°C
+  soilMoistureOverride: 80 // 80%
 };
 
 // Ruta raíz
@@ -76,6 +77,9 @@ app.get('/sensors', (req, res) => {
     soilMoisture: +(Math.random() * 40 + 30).toFixed(1),
     phLevel: +(Math.random() * 2 + 5.5).toFixed(2),
     timestamp: new Date().toISOString(),
+    soilMoisture: settings.soilMoistureOverride !== null
+    ? +settings.soilMoistureOverride.toFixed(1)
+    : +(Math.random() * 40 + 30).toFixed(1),
   };
   res.json(data);
 });
@@ -88,6 +92,15 @@ app.get('/device', (req, res) => {
     status: "Conectado",
     ipAddress: "127.0.0.1",
     firmwareVersion: "2.1.3"
+  });
+});
+
+app.post('/settings/soil-moisture', (req, res) => {
+  const { value } = req.body;
+  settings.soilMoistureOverride = value;
+  res.json({
+    message: `Humedad del suelo forzada a ${value}%`,
+    settings
   });
 });
 
