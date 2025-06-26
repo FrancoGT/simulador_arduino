@@ -54,6 +54,46 @@ app.post('/control', (req, res) => {
   res.json({ message: `Comando '${command}' recibido correctamente.` });
 });
 
+// Actualizar humedad mínima (ej: 20%)
+app.post('/settings/humidity/min', (req, res) => {
+  const { value } = req.body;
+  settings.minHumidity = value;
+  res.json({ 
+    message: `Humedad mínima actualizada a ${value}%`,
+    settings 
+  });
+});
+
+// Actualizar humedad máxima (ej: 80%)
+app.post('/settings/humidity/max', (req, res) => {
+  const { value } = req.body;
+  settings.maxHumidity = value;
+  res.json({ 
+    message: `Humedad máxima actualizada a ${value}%`,
+    settings 
+  });
+});
+
+// Actualizar temperatura mínima (ej: 5°C)
+app.post('/settings/temperature/min', (req, res) => {
+  const { value } = req.body;
+  settings.minTemperature = value;
+  res.json({ 
+    message: `Temperatura mínima actualizada a ${value}°C`,
+    settings 
+  });
+});
+
+// Actualizar temperatura máxima (ej: 35°C)
+app.post('/settings/temperature/max', (req, res) => {
+  const { value } = req.body;
+  settings.maxTemperature = value;
+  res.json({ 
+    message: `Temperatura máxima actualizada a ${value}°C`,
+    settings 
+  });
+});
+
 // Inicio del servidor
 app.listen(port, () => {
   console.log(`Servidor simulador Arduino activo en http://localhost:${port}`);
