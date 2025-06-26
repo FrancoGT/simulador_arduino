@@ -8,51 +8,25 @@ const port = process.env.PORT || 10000;
 app.use(cors());
 app.use(express.json());
 
-// Ruta raíz opcional para verificación manual en navegador
+// Valores iniciales
+let settings = {
+  minHumidity: 20,    // 20%
+  maxHumidity: 80,    // 80%
+  minTemperature: 5,  // 5°C
+  maxTemperature: 35  // 35°C
+};
+
+// Ruta raíz
 app.get('/', (req, res) => {
   res.send('API Arduino simulada activa');
 });
 
-// Simulación de datos dinámicos
-function getRandomSensorData() {
-  return {
-    temperature: +(Math.random() * 20 + 15).toFixed(1),
-    humidity: +(Math.random() * 60 + 20).toFixed(1),
-    soilMoisture: +(Math.random() * 40 + 30).toFixed(1),
-    phLevel: +(Math.random() * 2 + 5.5).toFixed(2),
-    timestamp: new Date().toISOString(),
-  };
-}
-
-// Simulación de información del dispositivo
-function getDeviceInfo() {
-  return {
-    name: "ESP32",
-    description: "Simulado",
-    status: "Conectado",
-    ipAddress: "127.0.0.1",
-    firmwareVersion: "2.1.3"
-  };
-}
-
-// Endpoints
-app.get('/sensors', (req, res) => {
-  res.json(getRandomSensorData());
+// Obtener todos los valores actuales
+app.get('/settings', (req, res) => {
+  res.json(settings);
 });
 
-app.get('/device', (req, res) => {
-  res.json(getDeviceInfo());
-});
-
-app.post('/control', (req, res) => {
-  const { command } = req.body;
-  console.log("Comando recibido:", command);
-  if (!command) {
-    return res.status(400).json({ error: "Se requiere un comando en el cuerpo de la solicitud." });
-  }
-
-  res.json({ message: `Comando '${command}' recibido correctamente.` });
-});
+// Endpoints específicos para actualización:
 
 // Actualizar humedad mínima (ej: 20%)
 app.post('/settings/humidity/min', (req, res) => {
@@ -91,6 +65,29 @@ app.post('/settings/temperature/max', (req, res) => {
   res.json({ 
     message: `Temperatura máxima actualizada a ${value}°C`,
     settings 
+  });
+});
+
+// Simulación de datos dinámicos
+app.get('/sensors', (req, res) => {
+  const data = {
+    temperature: +(Math.random() * (settings.maxTemperature - settings.minTemperature) + settings.minTemperature).toFixed(1),
+    humidity: +(Math.random() * (settings.maxHumidity - settings.minHumidity) + settings.minHumidity).toFixed(1),
+    soilMoisture: +(Math.random() * 40 + 30).toFixed(1),
+    phLevel: +(Math.random() * 2 + 5.5).toFixed(2),
+    timestamp: new Date().toISOString(),
+  };
+  res.json(data);
+});
+
+// Información del dispositivo
+app.get('/device', (req, res) => {
+  res.json({
+    name: "ESP32",
+    description: "Simulado",
+    status: "Conectado",
+    ipAddress: "127.0.0.1",
+    firmwareVersion: "2.1.3"
   });
 });
 
